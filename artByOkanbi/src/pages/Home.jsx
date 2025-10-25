@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import ImageList from '../common/components/ImageList';
+import FullscreenSlider from '../common/components/FullscreenSlider';
 
 const images = [
   'https://res.cloudinary.com/https-pilot-tune-herokuapp-com/image/upload/v1680018342/20230322_141840_wsa7ja.jpg',
@@ -14,14 +14,29 @@ const images = [
   'https://res.cloudinary.com/https-pilot-tune-herokuapp-com/image/upload/v1680018328/39283232_ifjmiw.jpg',
 ];
 
+const titles = [
+  'SCROLL',
+  'EXPLORE',
+  'DISCOVER',
+  'IMMERSE',
+  'REFLECT',
+  'ADMIRE',
+  'OBSERVE',
+  'CONTEMPLATE',
+  'EXPERIENCE',
+  'APPRECIATE'
+];
+
 function Home() {
   return (
     <div>
-      <ImageList images={images} />
-      <a id='source-link' className='meta-link' target='_blank'>
-        <i className='fa-solid fa-link'></i>
-        <span>All art by Okanbi Ifatola</span>
-      </a>
+      <FullscreenSlider images={images} titles={titles} />
+      <footer className="fixed bottom-0 z-[999] flex items-center justify-between px-8 w-full h-28 text-white text-sm md:text-base">
+        <a href="https://greensock.com/docs/v3/Plugins/Observer" className="text-white no-underline hover:underline">
+          GSAP Observer
+        </a>
+        <p className="m-0">All art by Okanbi Ifatola</p>
+      </footer>
     </div>
   );
 }
