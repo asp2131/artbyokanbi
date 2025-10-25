@@ -1,34 +1,10 @@
 import React from 'react';
-import styled from 'styled-components';
-
-const AboutContainer = styled.div`
-  min-height: 100vh;
-  padding: 120px 40px 40px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: white;
-`;
-
-const Title = styled.h1`
-  font-size: 48px;
-  margin-bottom: 20px;
-  text-align: center;
-`;
-
-const Content = styled.div`
-  max-width: 800px;
-  font-size: 18px;
-  line-height: 1.8;
-  text-align: center;
-`;
 
 const About = () => {
   return (
-    <AboutContainer>
-      <Title>About the Artist</Title>
-      <Content>
+    <div className="min-h-screen pt-[120px] px-10 pb-10 flex flex-col items-center justify-center text-white">
+      <h1 className="text-5xl mb-5 text-center">About the Artist</h1>
+      <div className="max-w-[800px] text-lg leading-[1.8] text-center">
         <p>
           Okanbi Ifatola is a talented artist whose work explores the
           intersection of traditional and contemporary art forms. With a keen
@@ -39,8 +15,8 @@ const About = () => {
           Each artwork is a reflection of unique perspectives and experiences,
           bringing together color, form, and emotion in harmonious balance.
         </p>
-      </Content>
-    </AboutContainer>
+      </div>
+    </div>
   );
 };
 

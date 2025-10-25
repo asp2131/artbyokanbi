@@ -2,25 +2,6 @@ import { useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
-import styled from 'styled-components';
-
-const TransitionOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  z-index: 9999;
-  pointer-events: none;
-  transform: scaleX(0);
-  transform-origin: left;
-`;
-
-const PageWrapper = styled.div`
-  width: 100%;
-  min-height: 100vh;
-`;
 
 const PageTransition = ({ children }) => {
   const location = useLocation();
@@ -34,17 +15,14 @@ const PageTransition = ({ children }) => {
       const content = contentRef.current;
 
       if (overlay && content) {
-        // Create timeline for page transition
         const tl = gsap.timeline();
 
-        // Animate overlay in
         tl.to(overlay, {
           scaleX: 1,
           transformOrigin: 'left',
           duration: 0.5,
           ease: 'power3.inOut',
         })
-          // Fade out content during transition
           .to(
             content,
             {
@@ -54,7 +32,6 @@ const PageTransition = ({ children }) => {
             },
             '-=0.3'
           )
-          // Reset content position and fade in
           .set(content, {
             y: -20,
           })
@@ -64,7 +41,6 @@ const PageTransition = ({ children }) => {
             duration: 0.5,
             ease: 'power2.out',
           })
-          // Animate overlay out
           .to(
             overlay,
             {
@@ -82,8 +58,13 @@ const PageTransition = ({ children }) => {
 
   return (
     <div ref={containerRef}>
-      <TransitionOverlay ref={overlayRef} />
-      <PageWrapper ref={contentRef}>{children}</PageWrapper>
+      <div
+        ref={overlayRef}
+        className="fixed top-0 left-0 w-full h-full bg-gradient-to-br from-[#667eea] to-[#764ba2] z-[9999] pointer-events-none scale-x-0 origin-left"
+      />
+      <div ref={contentRef} className="w-full min-h-screen">
+        {children}
+      </div>
     </div>
   );
 };

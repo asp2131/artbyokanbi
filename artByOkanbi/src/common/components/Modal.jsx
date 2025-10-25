@@ -1,159 +1,7 @@
-import React, { useRef } from "react";
-import styled from "styled-components";
+import React, { useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-
-const ModalWrapper = styled(motion.div)`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(10px);
-  z-index: 100;
-  padding: 20px;
-`;
-
-const ModalContent = styled(motion.div)`
-  position: relative;
-  display: flex;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  width: 95%;
-  max-width: 1200px;
-  height: auto;
-  max-height: 90vh;
-  border-radius: 24px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-  overflow: hidden;
-
-  @media (max-width: 968px) {
-    flex-direction: column;
-    width: 90%;
-    max-height: 85vh;
-  }
-`;
-
-const ImageWrapper = styled.div`
-  flex: 1.5;
-  min-height: 400px;
-  max-height: 80vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  padding: 40px;
-  background: rgba(0, 0, 0, 0.3);
-
-  @media (max-width: 968px) {
-    min-height: 300px;
-    max-height: 50vh;
-    padding: 20px;
-  }
-`;
-
-const Image = styled.img`
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-`;
-
-const DescriptionWrapper = styled.div`
-  flex: 1;
-  padding: 60px 50px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  color: white;
-  position: relative;
-
-  @media (max-width: 968px) {
-    padding: 40px 30px;
-  }
-`;
-
-const ArtTitle = styled.h2`
-  font-size: 32px;
-  font-weight: 700;
-  margin-bottom: 20px;
-  color: white;
-  letter-spacing: -0.5px;
-
-  @media (max-width: 968px) {
-    font-size: 24px;
-  }
-`;
-
-const Description = styled.p`
-  font-size: 18px;
-  line-height: 1.8;
-  margin-bottom: 30px;
-  color: rgba(255, 255, 255, 0.85);
-
-  @media (max-width: 968px) {
-    font-size: 16px;
-  }
-`;
-
-const ArtDetails = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
-`;
-
-const DetailItem = styled.div`
-  display: flex;
-  align-items: center;
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.7);
-  gap: 10px;
-
-  span:first-child {
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.9);
-    min-width: 80px;
-  }
-`;
-
-const CloseButton = styled.button`
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  width: 44px;
-  height: 44px;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 20px;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  z-index: 10;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: rotate(90deg);
-  }
-
-  &:active {
-    transform: rotate(90deg) scale(0.9);
-  }
-`;
 
 const Modal = ({ isOpen, onClose, imageSrc, description }) => {
   const modalRef = useRef(null);
@@ -161,17 +9,50 @@ const Modal = ({ isOpen, onClose, imageSrc, description }) => {
   const imageRef = useRef(null);
   const descriptionRef = useRef(null);
 
+  // Lock body scroll when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      const scrollY = window.scrollY;
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+      document.body.style.width = '100%';
+      document.body.dataset.scrollY = scrollY.toString();
+    } else {
+      const scrollY = document.body.dataset.scrollY;
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      document.body.style.width = '';
+
+      if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY));
+      }
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      document.body.style.width = '';
+    };
+  }, [isOpen]);
+
   useGSAP(
     () => {
       if (isOpen && modalRef.current && contentRef.current) {
-        // Backdrop fade in
         gsap.fromTo(
           modalRef.current,
           { opacity: 0 },
           { opacity: 1, duration: 0.3, ease: "power2.out" }
         );
 
-        // Modal content animation - scale and rotate effect
         gsap.fromTo(
           contentRef.current,
           {
@@ -189,7 +70,6 @@ const Modal = ({ isOpen, onClose, imageSrc, description }) => {
           }
         );
 
-        // Image slide and fade in
         if (imageRef.current) {
           gsap.fromTo(
             imageRef.current,
@@ -198,7 +78,6 @@ const Modal = ({ isOpen, onClose, imageSrc, description }) => {
           );
         }
 
-        // Description slide from right
         if (descriptionRef.current) {
           gsap.fromTo(
             descriptionRef.current,
@@ -244,39 +123,63 @@ const Modal = ({ isOpen, onClose, imageSrc, description }) => {
   return (
     <>
       {isOpen && (
-        <ModalWrapper
+        <motion.div
           ref={modalRef}
           initial="closed"
           animate="open"
           exit="closed"
           variants={variants}
           onClick={handleClose}
+          className="fixed top-0 left-0 right-0 bottom-0 w-screen h-screen flex justify-center items-center bg-black/85 backdrop-blur-[10px] z-[9999] p-5 overflow-y-auto overscroll-contain"
         >
-          <ModalContent ref={contentRef} onClick={(e) => e.stopPropagation()}>
-            <CloseButton onClick={handleClose}>✕</CloseButton>
-            <ImageWrapper>
-              <Image ref={imageRef} src={imageSrc} alt="Artwork" />
-            </ImageWrapper>
-            <DescriptionWrapper ref={descriptionRef}>
-              <ArtTitle>Original Artwork</ArtTitle>
-              <Description>{description}</Description>
-              <ArtDetails>
-                <DetailItem>
-                  <span>Artist:</span>
+          <motion.div
+            ref={contentRef}
+            onClick={(e) => e.stopPropagation()}
+            className="relative flex bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-[20px] border border-white/[0.18] w-[95%] max-w-[1200px] h-auto max-h-[90vh] rounded-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] overflow-y-auto overscroll-contain m-auto lg:flex-row flex-col lg:w-[90%] lg:max-h-[85vh] max-[480px]:w-[95%] max-[480px]:max-w-[95vw] max-[480px]:rounded-2xl"
+          >
+            <button
+              onClick={handleClose}
+              className="absolute top-5 right-5 w-11 h-11 bg-white/10 backdrop-blur-[10px] border border-white/[0.18] rounded-full cursor-pointer text-xl text-white flex items-center justify-center transition-all duration-300 z-10 hover:bg-white/20 hover:rotate-90 active:rotate-90 active:scale-90"
+            >
+              ✕
+            </button>
+
+            <div className="flex-[1.5] min-h-[400px] max-h-[80vh] flex justify-center items-center relative p-10 bg-black/30 lg:min-h-[400px] lg:max-h-[80vh] lg:p-10 max-lg:min-h-[300px] max-lg:max-h-[50vh] max-lg:p-5 max-[480px]:min-h-[250px] max-[480px]:p-4">
+              <img
+                ref={imageRef}
+                src={imageSrc}
+                alt="Artwork"
+                className="w-full h-full object-contain rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.5)]"
+              />
+            </div>
+
+            <div
+              ref={descriptionRef}
+              className="flex-1 py-[60px] px-[50px] flex flex-col justify-center text-white relative max-lg:py-10 max-lg:px-[30px]"
+            >
+              <h2 className="text-[32px] font-bold mb-5 text-white tracking-[-0.5px] max-lg:text-2xl">
+                Original Artwork
+              </h2>
+              <p className="text-lg leading-[1.8] mb-[30px] text-white/85 max-lg:text-base">
+                {description}
+              </p>
+              <div className="flex flex-col gap-3 mt-5 pt-5 border-t border-white/20">
+                <div className="flex items-center text-sm text-white/70 gap-2.5">
+                  <span className="font-semibold text-white/90 min-w-[80px]">Artist:</span>
                   <span>Okanbi Ifatola</span>
-                </DetailItem>
-                <DetailItem>
-                  <span>Medium:</span>
+                </div>
+                <div className="flex items-center text-sm text-white/70 gap-2.5">
+                  <span className="font-semibold text-white/90 min-w-[80px]">Medium:</span>
                   <span>Mixed Media</span>
-                </DetailItem>
-                <DetailItem>
-                  <span>Year:</span>
+                </div>
+                <div className="flex items-center text-sm text-white/70 gap-2.5">
+                  <span className="font-semibold text-white/90 min-w-[80px]">Year:</span>
                   <span>2023</span>
-                </DetailItem>
-              </ArtDetails>
-            </DescriptionWrapper>
-          </ModalContent>
-        </ModalWrapper>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
       )}
     </>
   );

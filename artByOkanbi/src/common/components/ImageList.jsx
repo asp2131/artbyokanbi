@@ -3,65 +3,9 @@ import { useState, useEffect, useRef } from 'react'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import styled from 'styled-components'
 import Modal from './Modal'
 
 gsap.registerPlugin(ScrollTrigger)
-
-const BentoGrid = styled(motion.div)`
-  padding: 100px 40px 40px;
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  grid-auto-rows: 250px;
-  grid-auto-flow: dense;
-  gap: 20px;
-  max-width: 1600px;
-  margin: 0 auto;
-
-  @media (max-width: 1024px) {
-    grid-template-columns: repeat(4, 1fr);
-    grid-auto-rows: 200px;
-    gap: 15px;
-    padding: 80px 20px 20px;
-  }
-
-  @media (max-width: 768px) {
-    grid-template-columns: repeat(2, 1fr);
-    grid-auto-rows: 180px;
-    gap: 12px;
-  }
-`
-
-const BentoItem = styled(motion.div)`
-  background: url(${props => props.$bgImage}) center center / cover no-repeat;
-  cursor: pointer;
-  border-radius: 16px;
-  overflow: hidden;
-  position: relative;
-  transition: transform 0.3s ease;
-
-  &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      180deg,
-      rgba(0, 0, 0, 0) 0%,
-      rgba(0, 0, 0, 0.3) 100%
-    );
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-
-  &:hover::after {
-    opacity: 1;
-  }
-`
 
 const staggeredGrid = {
   animate: {
@@ -192,24 +136,31 @@ export default function StaggeredGrid({ images }) {
   }
 
   return (
-    <BentoGrid
+    <motion.div
       ref={containerRef}
       variants={staggeredGrid}
       initial='initial'
       animate='animate'
+      className="pt-[100px] px-10 pb-10 grid grid-cols-6 auto-rows-[250px] gap-5 max-w-[1600px] mx-auto lg:grid-cols-4 lg:auto-rows-[200px] lg:gap-[15px] lg:pt-20 lg:px-5 lg:pb-5 md:grid-cols-2 md:auto-rows-[180px] md:gap-3"
+      style={{ gridAutoFlow: 'dense' }}
     >
       {images.map((image, index) => (
-        <BentoItem
+        <motion.div
           key={index}
           ref={el => (imageRefs.current[index] = el)}
           variants={imageVariants}
-          className='image'
-          $bgImage={image}
-          style={getBentoLayout(index)}
+          className='image cursor-pointer rounded-2xl overflow-hidden relative transition-transform duration-300 ease-in-out hover:-translate-y-[5px] hover:shadow-[0_20px_40px_rgba(0,0,0,0.3)] after:content-[""] after:absolute after:inset-0 after:bg-gradient-to-b after:from-transparent after:to-black/30 after:opacity-0 after:transition-opacity after:duration-300 hover:after:opacity-100'
+          style={{
+            backgroundImage: `url(${image})`,
+            backgroundPosition: 'center center',
+            backgroundSize: 'cover',
+            backgroundRepeat: 'no-repeat',
+            ...getBentoLayout(index)
+          }}
           onClick={() => handleImageClick(image)}
         />
       ))}
       <Modal isOpen={isOpen} onClose={onClose} imageSrc={selectedImage} description={"Art by Okanbi Ifatola"} />
-    </BentoGrid>
+    </motion.div>
   )
 }
