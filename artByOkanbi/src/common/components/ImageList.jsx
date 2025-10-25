@@ -1,7 +1,67 @@
 import { motion } from 'framer-motion'
-import { useState, useEffect } from 'react'
-// import { useInView } from 'react-intersection-observer'
+import { useState, useEffect, useRef } from 'react'
+import { useGSAP } from '@gsap/react'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import styled from 'styled-components'
 import Modal from './Modal'
+
+gsap.registerPlugin(ScrollTrigger)
+
+const BentoGrid = styled(motion.div)`
+  padding: 100px 40px 40px;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-auto-rows: 250px;
+  grid-auto-flow: dense;
+  gap: 20px;
+  max-width: 1600px;
+  margin: 0 auto;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: 200px;
+    gap: 15px;
+    padding: 80px 20px 20px;
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: 180px;
+    gap: 12px;
+  }
+`
+
+const BentoItem = styled(motion.div)`
+  background: url(${props => props.$bgImage}) center center / cover no-repeat;
+  cursor: pointer;
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 0.3) 100%
+    );
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover::after {
+    opacity: 1;
+  }
+`
 
 const staggeredGrid = {
   animate: {
@@ -30,6 +90,40 @@ export default function StaggeredGrid({ images }) {
   const [loaded, setLoaded] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const [selectedImage, setSelectedImage] = useState(null)
+  const imageRefs = useRef([])
+  const containerRef = useRef(null)
+
+  // GSAP ScrollTrigger animations for images
+  useGSAP(
+    () => {
+      imageRefs.current.forEach((image) => {
+        if (image) {
+          gsap.fromTo(
+            image,
+            {
+              opacity: 0,
+              scale: 0.8,
+              y: 50,
+            },
+            {
+              opacity: 1,
+              scale: 1,
+              y: 0,
+              duration: 0.8,
+              ease: 'power3.out',
+              scrollTrigger: {
+                trigger: image,
+                start: 'top 85%',
+                end: 'top 50%',
+                toggleActions: 'play none none reverse',
+              },
+            }
+          )
+        }
+      })
+    },
+    { dependencies: [images], scope: containerRef }
+  )
 
   // translate all images based on mouse position
   useEffect(() => {
@@ -75,46 +169,47 @@ export default function StaggeredGrid({ images }) {
     setIsOpen(false)
   }
 
-  const handleImageClick = e => {
-    setSelectedImage(e.target.style.backgroundImage.slice(5, -2))
-    console.log(e.target.style.backgroundImage.slice(5, -2))
+  const handleImageClick = (image) => {
+    setSelectedImage(image)
     setIsOpen(true)
   }
 
+  // Bento grid layout patterns - defines size of each item
+  const getBentoLayout = (index) => {
+    const patterns = [
+      { gridColumn: 'span 2', gridRow: 'span 2' },  // Square large
+      { gridColumn: 'span 2', gridRow: 'span 1' },  // Horizontal
+      { gridColumn: 'span 2', gridRow: 'span 2' },  // Square large
+      { gridColumn: 'span 3', gridRow: 'span 1' },  // Wide
+      { gridColumn: 'span 3', gridRow: 'span 2' },  // Wide tall
+      { gridColumn: 'span 2', gridRow: 'span 1' },  // Horizontal
+      { gridColumn: 'span 2', gridRow: 'span 2' },  // Square large
+      { gridColumn: 'span 2', gridRow: 'span 1' },  // Horizontal
+      { gridColumn: 'span 3', gridRow: 'span 2' },  // Wide tall
+      { gridColumn: 'span 3', gridRow: 'span 1' },  // Wide
+    ]
+    return patterns[index % patterns.length]
+  }
+
   return (
-    <motion.div
+    <BentoGrid
+      ref={containerRef}
       variants={staggeredGrid}
       initial='initial'
       animate='animate'
-      style={{
-        paddingTop: '5rem',
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-        gridAutoRows: 'minmax(250px, auto)',
-        gridGap: '1rem',
-      }}
     >
       {images.map((image, index) => (
-        <>
-        <motion.div
+        <BentoItem
           key={index}
+          ref={el => (imageRefs.current[index] = el)}
           variants={imageVariants}
           className='image'
-          style={{
-            background: `url(${image}) center center / cover no-repeat`,
-            cursor: 'pointer',
-            opacity: loaded ? 1 : 0,
-            // filter: loaded ? 'none' : 'blur(10px)',
-            height: '100%',
-            width: '100%',
-          }}
-          onClick={handleImageClick}
-          // onMouseEnter={handleImageEnter}
-          // onMouseLeave={handleImageLeave}
+          $bgImage={image}
+          style={getBentoLayout(index)}
+          onClick={() => handleImageClick(image)}
         />
-        </>
       ))}
       <Modal isOpen={isOpen} onClose={onClose} imageSrc={selectedImage} description={"Art by Okanbi Ifatola"} />
-    </motion.div>
+    </BentoGrid>
   )
 }

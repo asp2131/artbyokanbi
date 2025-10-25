@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { motion } from "framer-motion";
 
@@ -182,26 +183,26 @@ const Navbar = () => {
           </HamburgerMenu>
           <NavItems variants={navbarVariants}>
             <NavItem variants={itemVariants}>
-              <a href="#">Home</a>
+              <Link to="/">Home</Link>
             </NavItem>
             <NavItem variants={itemVariants}>
-              <a href="#">About</a>
+              <Link to="/about">About</Link>
             </NavItem>
             <NavItem variants={itemVariants}>
-              <a href="#">Contact</a>
+              <Link to="/contact">Contact</Link>
             </NavItem>
           </NavItems>
         </NavbarContainer>
         <DrawerWrapper style={{ transform: showDrawer ? "translateX(0)" : "" }}>
           <DrawerItems>
             <DrawerItem onClick={toggleDrawer}>
-              <a href="#">Home</a>
+              <Link to="/">Home</Link>
             </DrawerItem>
             <DrawerItem onClick={toggleDrawer}>
-              <a href="#">About</a>
+              <Link to="/about">About</Link>
             </DrawerItem>
             <DrawerItem onClick={toggleDrawer}>
-              <a href="#">Contact</a>
+              <Link to="/contact">Contact</Link>
             </DrawerItem>
           </DrawerItems>
         </DrawerWrapper>
