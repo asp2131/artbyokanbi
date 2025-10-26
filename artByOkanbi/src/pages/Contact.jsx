@@ -10,7 +10,7 @@ const Contact = () => {
           available artwork? Feel free to reach out!
         </p>
         <div className="mt-[30px] flex flex-col gap-[15px]">
-          <div className="text-xl">Email: 123okanbi@gmail.com</div>
+          <div className="text-xl">Email: 1234okanbi@gmail.com</div>
           <div className="text-xl">Instagram: @artbyokanbi</div>
           <div className="text-xl">Phone: +1 (216) 258-3700</div>
         </div>
