@@ -122,11 +122,13 @@ const Modal = ({ isOpen, onClose, imageSrc, description }) => {
             closeButtonRef.current,
             {
               scale: 0,
-              rotation: -180
+              rotation: -180,
+              opacity: 0
             },
             {
               scale: 1,
               rotation: 0,
+              opacity: 1,
               duration: 0.5,
               ease: "back.out(2)"
             },
@@ -229,8 +231,8 @@ const Modal = ({ isOpen, onClose, imageSrc, description }) => {
         <button
           ref={closeButtonRef}
           onClick={handleClose}
-          className="absolute top-4 right-4 z-20 w-12 h-12 flex items-center justify-center rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 hover:rotate-90 hover:scale-110 transition-all duration-300"
-          style={{ opacity: 0 }}
+          className="absolute top-4 right-4 z-50 w-12 h-12 flex items-center justify-center rounded-full bg-white/20 backdrop-blur-sm border-2 border-white/40 text-white hover:bg-white/30 hover:rotate-90 hover:scale-110 transition-all duration-300 shadow-lg"
+          aria-label="Close modal"
         >
           <svg
             width="24"

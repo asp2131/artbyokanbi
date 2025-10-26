@@ -23,7 +23,7 @@ const Navbar = () => {
         variants={navbarVariants}
         initial="hidden"
         animate="visible"
-        className="flex justify-between items-center p-5 bg-transparent fixed top-0 left-0 w-full z-1000"
+        className="flex justify-between items-center p-5 bg-transparent fixed top-0 left-0 w-full z-[10001]"
       >
         <motion.h1 variants={itemVariants} className="text-white text-2xl">
           Art by Okanbi.
